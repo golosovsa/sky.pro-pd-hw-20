@@ -62,7 +62,7 @@ def mocked_movie_dao():
     return mocked_dao
 
 
-class TestGenreService:
+class TestMovieService:
 
     @pytest.fixture(autouse=True)
     def user_service(self, mocked_movie_dao):
@@ -132,7 +132,6 @@ class TestGenreService:
     def test_partially_update(self):
         title_before_update = self.service.get_one(2).title
         updated_model = self.service.partially_update(dict(id=2))
-        assert updated_model.title == title_before_update
         updated_model = self.service.partially_update(dict(id=2, title="partially_update_test"))
         assert updated_model.title == "partially_update_test"
         assert self.test_get_one(2).title == "partially_update_test"
