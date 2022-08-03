@@ -7,6 +7,7 @@ from app.service.director import DirectorService
 
 TEST_DIRECTORS_COUNT = 10
 
+
 @pytest.fixture(scope="module")
 def mocked_director_dao():
     def create(data):
@@ -19,13 +20,11 @@ def mocked_director_dao():
         return director
 
     def update(data):
-        pass
-        # if "name" not in data:
-        #     data["name"] = directors[data["id"]].name
-        # directors[data["id"]].name = data["name"]
-        # return directors[data["id"]]
+        model = directors.get(data.get("id"))
+        model.name = data.get("name")
+        return model
 
-    directors = {i: Director(id=i, name=f"director-{i}") for i in range(1, TEST_DIRECTORS_COUNT+1)}
+    directors = {i: Director(id=i, name=f"director-{i}") for i in range(1, TEST_DIRECTORS_COUNT + 1)}
 
     mocked_dao = DirectorDAO(None)
 
@@ -36,6 +35,7 @@ def mocked_director_dao():
     mocked_dao.update = MagicMock(side_effect=update)
 
     return mocked_dao
+
 
 class TestDirectorService:
 
@@ -78,24 +78,18 @@ class TestDirectorService:
         assert self.service.get_one(before_max_id) is None
 
     def test_update(self):
-        # updated_model = self.service.update(dict(id=1, name="update_test"))
-        # assert 1 == updated_model.id
-        # assert "update_test" == updated_model.name
-        #
-        # get_model = self.service.get_one(1)
-        # assert get_model.id == updated_model.id
-        # assert "update_test" == get_model.name
-        pass
+        updated_model = self.service.update(dict(id=1, name="update_test"))
+        assert 1 == updated_model.id
+        assert "update_test" == updated_model.name
+
+        get_model = self.service.get_one(1)
+        assert get_model.id == updated_model.id
+        assert "update_test" == get_model.name
 
     def test_partially_update(self):
-        # name_before_update = self.service.get_one(2).name
-        # updated_model = self.service.partially_update(dict(id=2))
-        # assert updated_model.name == name_before_update
-        # updated_model = self.service.partially_update(dict(id=2, name="partially_update_test"))
-        # assert updated_model.name == "partially_update_test"
-        # assert self.test_get_one(2).name == "partially_update_test"
-        pass
-
-
-
-
+        name_before_update = self.service.get_one(2).name
+        updated_model = self.service.partially_update(dict(id=2))
+        assert updated_model.name == name_before_update
+        updated_model = self.service.partially_update(dict(id=2, name="partially_update_test"))
+        assert updated_model.name == "partially_update_test"
+        assert self.test_get_one(2).name == "partially_update_test"
